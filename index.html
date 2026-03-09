@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday Aarya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root { --gold:#c9a96e; --rose:#e8b4b8; --cream:#fdf8f2; --dark:#1a1108; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Raleway',sans-serif; background:var(--dark); color:var(--cream); overflow-x:hidden; }
+
+    /* ══════════ LOCK SCREEN ══════════ */
+    #lock-screen {
+      position:fixed; inset:0; z-index:9999;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=80') center/cover no-repeat;
+    }
+    #lock-screen::before {
+      content:''; position:absolute; inset:0;
+      background:rgba(0,0,0,0.38);
+      backdrop-filter:blur(24px) saturate(0.65);
+    }
+    #lock-screen.unlocking { animation:unlockOut 0.65s ease forwards; }
+    @keyframes unlockOut {
+      0%  { opacity:1; transform:scale(1); }
+      60% { opacity:1; transform:scale(1.04); }
+      100%{ opacity:0; transform:scale(1.1); pointer-events:none; }
+    }
+    #lock-screen.hidden { display:none; }
+
+    .lock-inner {
+      position:relative; z-index:2;
+      display:flex; flex-direction:column; align-items:center;
+    }
+
+    .lock-time {
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(4rem,18vw,6.5rem); font-weight:300;
+      color:white; line-height:1; letter-spacing:-2px;
+      text-shadow:0 2px 24px rgba(0,0,0,0.4);
+    }
+    .lock-date {
+      font-size:0.88rem; font-weight:400; letter-spacing:0.1em;
+      color:rgba(255,255,255,0.85); margin-top:6px; margin-bottom:32px;
+    }
+
+    .lock-notif {
+      background:rgba(255,255,255,0.17);
+      border:1px solid rgba(255,255,255,0.22);
+      border-radius:18px; padding:13px 20px;
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:38px; width:300px;
+      backdrop-filter:blur(14px);
+    }
+    .lock-notif-icon {
+      width:36px; height:36px; border-radius:9px;
+      background:linear-gradient(135deg,var(--rose),var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.2rem; flex-shrink:0;
+    }
+    .lock-notif-app { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:3px; }
+    .lock-notif-msg { font-size:0.82rem; color:white; }
+
+    .lock-label {
+      font-size:0.8rem; letter-spacing:0.25em; text-transform:uppercase;
+      color:rgba(255,255,255,0.88); margin-bottom:18px;
+      min-height:1.2em; transition:color 0.2s;
+    }
+    .lock-label.error { color:#ff6b6b; animation:shake 0.4s ease; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-9px)} 40%{transform:translateX(9px)}
+      60%{transform:translateX(-6px)} 80%{transform:translateX(5px)}
+    }
+
+    .lock-dots { display:flex; gap:18px; margin-bottom:34px; }
+    .lock-dot {
+      width:13px; height:13px; border-radius:50%;
+      border:2px solid rgba(255,255,255,0.8);
+      transition:background 0.12s, transform 0.12s;
+    }
+    .lock-dot.filled { background:white; transform:scale(1.18); }
+
+    .lock-keypad {
+      display:grid; grid-template-columns:repeat(3, 74px); gap:14px;
+    }
+    .lock-key {
+      width:74px; height:74px; border-radius:50%;
+      background:rgba(255,255,255,0.17);
+      border:1px solid rgba(255,255,255,0.2);
+      backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      cursor:pointer; transition:background 0.12s, transform 0.1s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .lock-key:active { background:rgba(255,255,255,0.38); transform:scale(0.93); }
+    .lock-key.empty  { background:transparent; border:none; pointer-events:none; }
+    .lock-key.delete { background:rgba(255,255,255,0.09); }
+    .lock-key-num    { font-size:1.55rem; font-weight:300; color:white; line-height:1; }
+    .lock-key-letters{ font-size:0.42rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-top:2px; }
+    .lock-key.delete svg { width:22px; height:22px; fill:white; opacity:0.82; }
+
+    /* ══════════ NAVBAR ══════════ */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:200;
+      display:flex; justify-content:center; align-items:center; padding:22px 40px;
+      background:linear-gradient(to bottom,rgba(10,7,3,0.92),transparent);
+    }
+    nav a {
+      font-weight:500; font-size:0.78rem; letter-spacing:0.35em; text-transform:uppercase;
+      color:var(--gold); text-decoration:none;
+      border:1px solid rgba(201,169,110,0.45); padding:10px 28px; border-radius:2px;
+      transition:background 0.3s,color 0.3s;
+    }
+    nav a:hover { background:var(--gold); color:var(--dark); }
+
+    /* ══════════ HERO ══════════ */
+    #hero {
+      min-height:100vh; display:flex; flex-direction:column;
+      justify-content:center; align-items:center; text-align:center;
+      position:relative; padding:80px 24px 60px;
+      background:
+        linear-gradient(to bottom,rgba(10,7,3,0.55) 0%,rgba(10,7,3,0.3) 50%,rgba(10,7,3,0.8) 100%),
+        url('1.jpeg') center/cover no-repeat;
+    }
+    .petal { position:absolute; border-radius:50% 0 50% 0; background:rgba(232,180,184,0.6); animation:fall linear infinite; pointer-events:none; }
+    @keyframes fall { 0%{transform:translateY(-60px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(360deg);opacity:0} }
+    .hero-eyebrow { font-size:0.72rem; letter-spacing:0.5em; text-transform:uppercase; color:var(--rose); margin-bottom:18px; animation:fadeUp 1s ease both 0.3s; }
+    .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(3.2rem,9vw,7.5rem); font-weight:300; font-style:italic; line-height:1.05; color:var(--cream); text-shadow:0 4px 40px rgba(201,169,110,0.3); animation:fadeUp 1s ease both 0.6s; }
+    .hero-title span { color:var(--gold); display:block; }
+    .hero-divider { width:90px; height:1px; background:linear-gradient(to right,transparent,var(--gold),transparent); margin:30px auto; animation:fadeUp 1s ease both 0.9s; }
+    .hero-desc { font-size:0.95rem; font-weight:300; letter-spacing:0.12em; color:rgba(253,248,242,0.75); max-width:480px; line-height:1.9; animation:fadeUp 1s ease both 1.1s; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    .scroll-hint { position:absolute; bottom:38px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; animation:fadeUp 1s ease both 1.6s; }
+    .scroll-hint span { font-size:0.62rem; letter-spacing:0.35em; text-transform:uppercase; color:rgba(201,169,110,0.6); }
+    .scroll-dot { width:1px; height:50px; background:linear-gradient(to bottom,var(--gold),transparent); animation:pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+    /* ══════════ CELEBRATE ══════════ */
+    #celebrate { padding:90px 40px 100px; background:var(--cream); color:var(--dark); }
+    .section-label { font-size:0.7rem; letter-spacing:0.5em; text-transform:uppercase; color:var(--gold); text-align:center; margin-bottom:60px; }
+    .card-container { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; border:1px solid rgba(201,169,110,0.3); border-radius:4px; overflow:hidden; box-shadow:0 24px 80px rgba(26,17,8,0.15); }
+    .card-image { position:relative; min-height:520px; background:url('4.jpeg') center/cover no-repeat; }
+    .card-image::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(201,169,110,0.25) 0%,transparent 60%); }
+    .card-text { padding:60px 56px; background:white; display:flex; flex-direction:column; justify-content:center; }
+    .card-tag { font-size:0.65rem; letter-spacing:0.45em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
+    .card-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; font-style:italic; color:var(--dark); line-height:1.15; margin-bottom:28px; }
+    .card-divider { width:50px; height:2px; background:var(--gold); margin-bottom:28px; }
+    .card-body { font-size:0.92rem; font-weight:300; line-height:2; color:#5a4a3a; margin-bottom:36px; }
+    .card-btn { display:inline-block; font-size:0.72rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--dark); border:1px solid var(--gold); padding:12px 30px; border-radius:2px; text-decoration:none; transition:background 0.3s,color 0.3s; align-self:flex-start; }
+    .card-btn:hover { background:var(--gold); color:white; }
+
+    /* ══════════ MOMENTS INTRO ══════════ */
+    #moments-intro {
+      position:relative; min-height:70vh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center; overflow:hidden; padding:60px 24px;
+      background:
+        linear-gradient(to bottom,rgba(10,7,3,0.5) 0%,rgba(10,7,3,0.7) 100%),
+        url('6.jpeg') center/cover no-repeat;
+    }
+    #moments-intro::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 15% 20%,rgba(255,255,255,0.7) 0%,transparent 100%),
+        radial-gradient(1px 1px at 80% 15%,rgba(255,255,255,0.5) 0%,transparent 100%),
+        radial-gradient(2px 2px at 45% 70%,rgba(201,169,110,0.6) 0%,transparent 100%),
+        radial-gradient(1px 1px at 70% 80%,rgba(255,255,255,0.6) 0%,transparent 100%),
+        radial-gradient(1.5px 1.5px at 30% 55%,rgba(201,169,110,0.4) 0%,transparent 100%),
+        radial-gradient(1px 1px at 90% 45%,rgba(255,255,255,0.5) 0%,transparent 100%);
+      animation:twinkle 3s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { 0%{opacity:0.4} 100%{opacity:1} }
+    .moments-intro-tag { font-size:0.68rem; letter-spacing:0.55em; text-transform:uppercase; color:var(--rose); margin-bottom:20px; }
+    .moments-intro-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.6rem,7vw,5.5rem); font-weight:300; font-style:italic; color:var(--cream); line-height:1.1; text-shadow:0 4px 40px rgba(0,0,0,0.5); margin-bottom:24px; }
+    .moments-intro-title em { color:var(--gold); }
+    .moments-intro-line { width:70px; height:1px; background:linear-gradient(to right,transparent,var(--gold),transparent); margin:0 auto 24px; }
+    .moments-intro-sub { font-size:0.88rem; font-weight:300; letter-spacing:0.1em; color:rgba(253,248,242,0.7); max-width:400px; line-height:1.8; }
+
+    /* ══════════ MUSIC BAR ══════════ */
+    #music-bar {
+      position:fixed; bottom:24px; right:24px; z-index:300;
+      background:rgba(26,17,8,0.92); border:1px solid rgba(201,169,110,0.35);
+      border-radius:50px; padding:10px 20px 10px 14px;
+      display:flex; align-items:center; gap:12px;
+      backdrop-filter:blur(12px); box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      min-width:220px;
+    }
+    #music-toggle { width:36px; height:36px; border-radius:50%; background:var(--gold); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.2s; }
+    #music-toggle:hover { transform:scale(1.1); }
+    #music-toggle svg { width:14px; height:14px; fill:var(--dark); }
+    .music-info { flex:1; overflow:hidden; }
+    .music-now { font-size:0.58rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:2px; }
+    .music-title-bar { font-size:0.78rem; font-weight:500; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .eq { display:flex; align-items:flex-end; gap:2px; height:16px; }
+    .eq-bar { width:3px; background:var(--gold); border-radius:2px; animation:eq-bounce 0.6s ease-in-out infinite alternate; }
+    .eq-bar:nth-child(1){height:8px;animation-delay:0s}
+    .eq-bar:nth-child(2){height:14px;animation-delay:0.1s}
+    .eq-bar:nth-child(3){height:6px;animation-delay:0.2s}
+    .eq-bar:nth-child(4){height:12px;animation-delay:0.05s}
+    @keyframes eq-bounce { 0%{transform:scaleY(0.4)} 100%{transform:scaleY(1)} }
+    .eq.paused .eq-bar { animation-play-state:paused; }
+
+    /* ══════════ INTRO MOMENT ══════════ */
+    #intro-moment .moment-text     { grid-column:1 !important; grid-row:1 !important; }
+    #intro-moment .moment-dot-col  { grid-column:2 !important; grid-row:1 !important; }
+    #intro-moment .moment-img-wrap { grid-column:3 !important; grid-row:1 !important; }
+    #intro-moment .moment-year     { color:var(--rose); }
+
+    /* ══════════ TIMELINE ══════════ */
+    #timeline { background:var(--dark); padding:0 0 140px; position:relative; }
+    .timeline-line { position:absolute; left:50%; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,transparent,var(--gold) 5%,var(--gold) 95%,transparent); transform:translateX(-50%); }
+
+    .moment {
+      display:grid; grid-template-columns:1fr 80px 1fr;
+      align-items:center; min-height:90vh; position:relative;
+      opacity:0; transform:translateY(60px);
+      transition:opacity 0.9s ease,transform 0.9s ease;
+    }
+    .moment.visible { opacity:1; transform:translateY(0); }
+
+    .moment:nth-child(odd)  .moment-img-wrap { grid-column:1; grid-row:1; }
+    .moment:nth-child(odd)  .moment-dot-col  { grid-column:2; grid-row:1; }
+    .moment:nth-child(odd)  .moment-text     { grid-column:3; grid-row:1; }
+    .moment:nth-child(even) .moment-text     { grid-column:1; grid-row:1; }
+    .moment:nth-child(even) .moment-dot-col  { grid-column:2; grid-row:1; }
+    .moment:nth-child(even) .moment-img-wrap { grid-column:3; grid-row:1; }
+
+    .moment-img-wrap { padding:60px 40px; display:flex; justify-content:center; }
+    .moment-img-frame { position:relative; width:100%; max-width:420px; aspect-ratio:4/3; border-radius:4px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    .moment-img-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s ease; }
+    .moment-img-frame:hover img { transform:scale(1.05); }
+    .moment-img-frame::after { content:''; position:absolute; inset:0; border-radius:4px; pointer-events:none; }
+    /* Always-on gold glow border */
+    .moment-img-frame {
+      box-shadow:
+        0 0 0 2px var(--gold),
+        0 0 18px 4px rgba(201,169,110,0.55),
+        0 0 40px 8px rgba(201,169,110,0.25),
+        0 20px 60px rgba(0,0,0,0.6);
+      animation: glow-pulse 2.5s ease-in-out infinite alternate;
+    }
+    @keyframes glow-pulse {
+      0%   { box-shadow: 0 0 0 2px var(--gold), 0 0 14px 4px rgba(201,169,110,0.4), 0 0 35px 8px rgba(201,169,110,0.18), 0 20px 60px rgba(0,0,0,0.6); }
+      100% { box-shadow: 0 0 0 2px var(--gold), 0 0 28px 8px rgba(201,169,110,0.7), 0 0 60px 14px rgba(201,169,110,0.35), 0 20px 60px rgba(0,0,0,0.6); }
+    }
+    .moment-num { position:absolute; top:16px; left:16px; font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; font-style:italic; color:rgba(255,255,255,0.85); line-height:1; text-shadow:0 2px 12px rgba(0,0,0,0.5); z-index:2; }
+
+    .moment-dot-col { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; }
+    .moment-dot { width:16px; height:16px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 4px rgba(201,169,110,0.25),0 0 20px rgba(201,169,110,0.5); position:relative; }
+    .moment-dot::after { content:''; position:absolute; width:16px; height:16px; border-radius:50%; border:1px solid rgba(201,169,110,0.35); top:50%; left:50%; transform:translate(-50%,-50%); animation:ripple 2s ease-in-out infinite; }
+    @keyframes ripple { 0%{width:16px;height:16px;opacity:1} 100%{width:48px;height:48px;opacity:0} }
+
+    .moment-text { padding:60px 40px; display:flex; flex-direction:column; justify-content:center; }
+    .moment-year { font-size:0.62rem; letter-spacing:0.5em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+    .moment-heading { font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:300; font-style:italic; color:var(--cream); line-height:1.2; margin-bottom:20px; }
+    .moment-rule { width:40px; height:1px; background:var(--gold); margin-bottom:20px; }
+    .moment-desc { font-size:0.9rem; font-weight:300; line-height:1.95; color:rgba(253,248,242,0.72); max-width:380px; }
+    .moment-song { margin-top:24px; display:inline-flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.25em; text-transform:uppercase; color:rgba(201,169,110,0.7); }
+    .moment-song svg { width:12px; height:12px; fill:var(--gold); }
+
+    .moment:nth-child(2){background:rgba(25,5,18,0.45)}
+    .moment:nth-child(3){background:rgba(5,14,25,0.4)}
+    .moment:nth-child(4){background:rgba(18,18,5,0.4)}
+    .moment:nth-child(5){background:rgba(25,5,5,0.4)}
+    .moment:nth-child(6){background:rgba(5,20,14,0.35)}
+    .moment:nth-child(7){background:rgba(18,12,25,0.4)}
+
+    /* ══════════ RESPONSIVE ══════════ */
+    @media(max-width:768px){
+      .card-container{grid-template-columns:1fr}
+      .card-image{min-height:300px}
+      .card-text{padding:44px 32px}
+      .timeline-line{left:20px}
+      .moment{grid-template-columns:40px 1fr;grid-template-rows:auto auto;min-height:unset}
+      .moment:nth-child(odd) .moment-img-wrap,
+      .moment:nth-child(even) .moment-img-wrap,
+      #intro-moment .moment-img-wrap{grid-column:2!important;grid-row:2!important}
+      .moment:nth-child(odd) .moment-dot-col,
+      .moment:nth-child(even) .moment-dot-col,
+      #intro-moment .moment-dot-col{grid-column:1!important;grid-row:1!important}
+      .moment:nth-child(odd) .moment-text,
+      .moment:nth-child(even) .moment-text,
+      #intro-moment .moment-text{grid-column:2!important;grid-row:1!important}
+      .moment-img-wrap{padding:16px 20px}
+      .moment-text{padding:30px 20px}
+      #intro-moment{min-height:auto}
+      #intro-moment .moment-img-wrap{min-height:220px}
+      #music-bar{min-width:180px;right:12px;bottom:12px}
+      .lock-keypad{grid-template-columns:repeat(3,68px);gap:12px}
+      .lock-key{width:68px;height:68px}
+    }
+
+        
+
+  </style>
+</head>
+<body>
+
+  <!-- <button class="setup-launch-btn" onclick="launchSite()">Launch Birthday Site ✦</button>
+  <span class="setup-skip" onclick="launchSite()">Skip & use placeholders</span> -->
+</div>
+
+
+<!-- ══════════ LOCK SCREEN ══════════ -->
+<div id="lock-screen">
+  <div class="lock-inner">
+    <div class="lock-time" id="lock-time">00:00</div>
+    <div class="lock-date" id="lock-date">Thursday, February 26</div>
+
+    <div class="lock-notif">
+      <div class="lock-notif-icon">🎂</div>
+      <div class="lock-notif-text">
+        <div class="lock-notif-app">Birthday App</div>
+        <div class="lock-notif-msg">A special surprise awaits you ✨</div>
+      </div>
+    </div>
+
+    <div class="lock-label" id="lock-label">Enter Passcode</div>
+    <div class="lock-dots" id="lock-dots">
+      <div class="lock-dot" id="d0"></div>
+      <div class="lock-dot" id="d1"></div>
+      <div class="lock-dot" id="d2"></div>
+      <div class="lock-dot" id="d3"></div>
+    </div>
+
+    <div class="lock-keypad">
+      <div class="lock-key" data-num="1"><span class="lock-key-num">1</span><span class="lock-key-letters"></span></div>
+      <div class="lock-key" data-num="2"><span class="lock-key-num">2</span><span class="lock-key-letters">ABC</span></div>
+      <div class="lock-key" data-num="3"><span class="lock-key-num">3</span><span class="lock-key-letters">DEF</span></div>
+      <div class="lock-key" data-num="4"><span class="lock-key-num">4</span><span class="lock-key-letters">GHI</span></div>
+      <div class="lock-key" data-num="5"><span class="lock-key-num">5</span><span class="lock-key-letters">JKL</span></div>
+      <div class="lock-key" data-num="6"><span class="lock-key-num">6</span><span class="lock-key-letters">MNO</span></div>
+      <div class="lock-key" data-num="7"><span class="lock-key-num">7</span><span class="lock-key-letters">PQRS</span></div>
+      <div class="lock-key" data-num="8"><span class="lock-key-num">8</span><span class="lock-key-letters">TUV</span></div>
+      <div class="lock-key" data-num="9"><span class="lock-key-num">9</span><span class="lock-key-letters">WXYZ</span></div>
+      <div class="lock-key empty"></div>
+      <div class="lock-key" data-num="0"><span class="lock-key-num">0</span></div>
+      <div class="lock-key delete" id="del-btn">
+        <svg viewBox="0 0 24 24"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3.59 13.59L17 18l-3-3-3 3-1.41-1.41L12.59 13l-3-2.99L11 8.59 14 11.6l3-3.01L18.41 10 15.4 13l3.01 3.01-1.41 1.41-.01-.01z"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN SITE ══════════ -->
+<nav><a href="#celebrate">✦ Let's Celebrate</a></nav>
+
+<section id="hero">
+  <p class="hero-eyebrow">✦ A very special day ✦</p>
+  <h1 class="hero-title">Happy Birthday<span>Aarya</span></h1>
+  <div class="hero-divider"></div>
+  <p class="hero-desc">चिरंजीव कुरु कीर्तिवर्धनम्।
+,<br/>चिरंजीव कुरु पुण्यवर्धनम्।</p>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-dot"></div></div>
+</section>
+
+<section id="celebrate">
+  <p class="section-label">✦ Let's Celebrate ✦</p>
+  <div class="card-container">
+    <div class="card-image"></div>
+    <div class="card-text">
+      <p class="card-tag">A Message for You</p>
+      <h2 class="card-title">A Day Written<br/>in Gold</h2>
+      <div class="card-divider"></div>
+      <p class="card-body">Today and always I celebrate you, your laughter that lights up every room, your warmth that makes every moment feel like home. This Birthday is not just about growing a year older; they are about cherishing the beautiful soul you have always been.<br/><br/>Cheers to adventures, treasured memories, and all the magic past 22 years gave you. You passed through all its ups and downs, and now lets celebrate journeys together.</p>
+      <a href="#moments-intro" class="card-btn">See Our Moments ↓</a>
+    </div>
+  </div>
+</section>
+
+<section id="moments-intro">
+  <p class="moments-intro-tag">✦ A journey through time ✦</p>
+  <h2 class="moments-intro-title">Moments I Always<br/><em>Remember with You</em></h2>
+  <div class="moments-intro-line"></div>
+  <p class="moments-intro-sub"> Stories written in laughter, tears, adventures, and love. Each one a treasure I hold close forever.</p>
+</section>
+
+<!-- MUSIC PLAYER -->
+<div id="music-bar">
+  <button id="music-toggle" aria-label="Play/Pause">
+    <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+  <div class="music-info">
+    <div class="music-now">♪ Now Playing</div>
+    <div class="music-title-bar" id="music-title">Scroll to moments to play</div>
+  </div>
+  <div class="eq paused" id="eq">
+    <div class="eq-bar"></div><div class="eq-bar"></div>
+    <div class="eq-bar"></div><div class="eq-bar"></div>
+  </div>
+</div>
+<audio id="bg-audio" loop></audio>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="timeline-line"></div>
+
+  <!-- INTRO MOMENT (inside timeline so spine covers it) -->
+<div id="intro-moment" class="moment visible" data-song-url="Moment0.mp3" data-start-time="29" data-song-name="Raktim">
+  <div class="moment-img-wrap">
+    <div class="moment-img-frame">
+      <img src="IMGi.jpeg" alt=""/>
+    </div>
+  </div>
+  <div class="moment-dot-col"><div class="moment-dot"></div></div>
+  <div class="moment-text">
+    <p class="moment-year">✦ Where It All Began</p>
+    <h3 class="moment-heading">We Started<br/>Through Music</h3>
+    <div class="moment-rule"></div>
+    <p class="moment-desc">I always saw you as a good woman from the moment I started getting to know you. It all began naturally, shared playlists, simple conversations. Quiet moments that slowly turned into comfort. Somewhere along the way, I was drawn to your warmth, your calm, and the way you make everything feel lighter. We shared thoughts, and small pieces of ourselves. My heart chose you effortlessly. And with every step closer, I fell deeper. So today, on your birthday, I don’t just celebrate the day you were born. I celebrate you, and the your moements with me.</p>
+    <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Raktim</span>
+  </div>
+</div>
+
+  <div class="moment" data-song-url="Moment1.mp3" data-start-time="18" data-song-name="Qayde Se">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG1.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Late Nights</p>
+      <h3 class="moment-heading">3 AM <br/>Conversation</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">I always saw you as a good woman from the moment I started getting to know you. It all began naturally, shared playlists, simple conversations. Quiet moments that slowly turned into comfort. Somewhere along the way, I was drawn to your warmth, your calm, and the way you make everything feel lighter. We shared thoughts, and small pieces of ourselves. My heart chose you effortlessly. And with every step closer, I fell deeper. So today, on your birthday, I don’t just celebrate the day you were born. I celebrate you, and the your moements with me.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Qayde Se</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment2.mp3" data-start-time="14" data-song-name="Mann Kaa Bhawana">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG2.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Before we met</p>
+      <h3 class="moment-heading">Excitment<br/> The Meet</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">I always saw you as a good woman from the moment I started getting to know you. It all began naturally, shared playlists, simple conversations. Quiet moments that slowly turned into comfort. Somewhere along the way, I was drawn to your warmth, your calm, and the way you make everything feel lighter. We shared thoughts, and small pieces of ourselves. My heart chose you effortlessly. And with every step closer, I fell deeper. So today, on your birthday, I don’t just celebrate the day you were born. I celebrate you, and the your moements with me.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Mann Kaa Bhawana</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment3.mp3" data-start-time="6" data-song-name="Hawayein">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG3.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Regular Meet</p>
+      <h3 class="moment-heading">6 pm<br/>After Office Walk</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">I always saw you as a good woman from the moment I started getting to know you. It all began naturally, shared playlists, simple conversations. Quiet moments that slowly turned into comfort. Somewhere along the way, I was drawn to your warmth, your calm, and the way you make everything feel lighter. We shared thoughts, and small pieces of ourselves. My heart chose you effortlessly. And with every step closer, I fell deeper. So today, on your birthday, I don’t just celebrate the day you were born. I celebrate you, and the your moements with me.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg>Hawayein</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment4.mp3" data-start-time="15" data-song-name="Dil Na Jaaneya">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG4.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Together</p>
+      <h3 class="moment-heading">Under The Same Roof<br/>And Places</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">I always saw you as a good woman from the moment I started getting to know you. It all began naturally, shared playlists, simple conversations. Quiet moments that slowly turned into comfort. Somewhere along the way, I was drawn to your warmth, your calm, and the way you make everything feel lighter. We shared thoughts, and small pieces of ourselves. My heart chose you effortlessly. And with every step closer, I fell deeper. So today, on your birthday, I don’t just celebrate the day you were born. I celebrate you, and the your moements with me.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Dil Na Jaaneya</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment5.mp3" data-start-time="20" data-song-name="Perfect">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG5.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Beautiful</p>
+      <h3 class="moment-heading">Mature<br/>Kind Heart</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">You are the most beautiful woman I know. Your smile brings a calm to my heart that nothing else can. I remember the way you cared for that dog, it showed me how deeply kind you are. You give so much love to your family and to others, without selfishness or pride, just quiet goodness. You lift me when I feel low, simply by being you. Your eyes, your hair, your lips, I can feel their presence even when you're not beside me. To me, you are not just pretty, you are the prettiest, inside and out.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Perfect</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment6.mp3" data-start-time="15" data-song-name="Dherai Dherai Aauncha Mana Ma">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG6.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Your New Begining</p>
+      <h3 class="moment-heading">Degree Completion<br/>Proud Of You</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">I am so proud of you for completing your degree. I still remember when you told me how difficult your first year was, how heavy everything felt then. From that struggle to becoming one of the finest students in your batch you truly did your best. You are a woman who rose from a hard place through strength and perseverance, and you did it on your own. I will always stand by you and do whatever I can to support your growth in life. You are a strong, admirable, and truly great woman.</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg>Dherai Dherai Aauncha Mana Ma</span>
+    </div>
+  </div>
+
+  <div class="moment" data-song-url="Moment7.mp3" data-start-time="12" data-song-name="Kal Chaudhvin Ki Raat Thi">
+    <div class="moment-img-wrap"><div class="moment-img-frame"><img src="IMG7.jpeg" alt=""/></div></div>
+    <div class="moment-dot-col"><div class="moment-dot"></div></div>
+    <div class="moment-text">
+      <p class="moment-year">✦ Right Now</p>
+      <h3 class="moment-heading">This Moment —<br/>Your Birthday</h3>
+      <div class="moment-rule"></div>
+      <p class="moment-desc">You've completed 22 beautiful years of your life. Even though I couldn't be with you on your previous birthdays, I promise to be there for every one that comes next—lighting candles, sharing smiles, and celebrating you. I will support you in everything you do and stand beside you as you grow into the best version of yourself.<br/>Happy Birthday, darling. 💙</p>
+      <span class="moment-song"><svg viewBox="0 0 24 24"><path d="M12 3v9.28a4 4 0 1 0 2 3.44V3h-2z"/></svg> Kal Chaudhvin Ki Raat Thi </span>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* ══════════ LOCK SCREEN ══════════ */
+  const PASSCODE = '1202'; // ← Change this to your secret code
+  let entered = '';
+
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('lock-time').textContent = h + ':' + m;
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('lock-date').textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('d'+i).classList.toggle('filled', i < entered.length);
+    }
+  }
+
+  function wrongCode() {
+    const lbl = document.getElementById('lock-label');
+    lbl.textContent = 'Incorrect Code';
+    lbl.classList.add('error');
+    setTimeout(() => {
+      lbl.textContent = 'Enter Passcode';
+      lbl.classList.remove('error');
+      entered = '';
+      updateDots();
+    }, 800);
+  }
+
+  function unlock() {
+    const ls = document.getElementById('lock-screen');
+    ls.classList.add('unlocking');
+    setTimeout(() => { ls.classList.add('hidden'); window.scrollTo({top:0,behavior:'instant'}); }, 650);
+    audio.load();
+    audio.play().then(() => {
+      audio.currentTime=18; setUI(true); fadeVol(0,0.45,900); userStarted=true;
+      // Prime Moment0.mp3 inside gesture so GitHub allows it later
+      const primer = new Audio('Moment0.mp3');
+      primer.volume=0;
+      primer.play().then(()=>{ primer.pause(); primer.src=''; }).catch(()=>{});
+    }).catch(() => { userStarted=true; });
+  }
+  document.querySelectorAll('.lock-key[data-num]').forEach(key => {
+    key.addEventListener('click', () => {
+      if (entered.length >= 4) return;
+      entered += key.dataset.num;
+      updateDots();
+      if (entered.length === 4) {
+        setTimeout(() => {
+          if (entered === PASSCODE) { unlock(); }
+          else { wrongCode(); }
+        }, 120);
+      }
+    });
+  });
+
+  document.getElementById('del-btn').addEventListener('click', () => {
+    entered = entered.slice(0, -1);
+    updateDots();
+    const lbl = document.getElementById('lock-label');
+    lbl.textContent = 'Enter Passcode';
+    lbl.classList.remove('error');
+  });
+
+  /* ══════════ PETALS ══════════ */
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.cssText = `left:${Math.random()*100}vw;top:-20px;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;opacity:${0.4+Math.random()*0.5}`;
+    document.getElementById('hero').appendChild(p);
+  }
+
+  /* Auto scroll removed — page starts at top after unlock */
+
+  /* ══════════ MUSIC ENGINE ══════════
+     Rules:
+     1. Lock screen unlock → intro music starts immediately (Moment.mp3 from 18s)
+     2. Scrolling to a moment → swaps to that moment's song at its start time
+     3. If user scrolls BACK to hero/intro section → intro music resumes
+     4. Song ends → restarts from the SAME start-time it first played (not 0)
+     5. User can pause/resume anytime with the ▶ button
+     6. Coming back to a section → song resumes from where it was left off
+        (unless it ended, in which case it loops from its own start-time)
+  ══════════════════════════════════ */
+  const audio=document.getElementById('bg-audio');
+  const titleEl=document.getElementById('music-title');
+  const toggleBtn=document.getElementById('music-toggle');
+  const iconPlay=document.getElementById('icon-play');
+  const iconPause=document.getElementById('icon-pause');
+  const eq=document.getElementById('eq');
+  let currentUrl=null,isPlaying=false,userStarted=false,userPaused=false;
+  const moments=document.querySelectorAll('.moment');
+  audio.src='Moment.mp3'; audio.volume=0; currentUrl='Moment.mp3'; titleEl.textContent='Magic';
+  function fadeVol(from,to,ms){ const steps=30,dt=ms/steps; let n=0; audio.volume=Math.max(0,Math.min(1,from)); const t=setInterval(()=>{ n++; audio.volume=Math.max(0,Math.min(1,from+(to-from)*(n/steps))); if(n>=steps)clearInterval(t); },dt); }
+  function setUI(p){ isPlaying=p; iconPlay.style.display=p?'none':'block'; iconPause.style.display=p?'block':'none'; eq.classList.toggle('paused',!p); }
+  function swapSong(url,name,st){ if(currentUrl===url)return; currentUrl=url; titleEl.textContent=name; fadeVol(audio.volume,0,300); setTimeout(()=>{ audio.src=url; audio.volume=0; audio.currentTime=st||0; if(!userPaused) audio.play().then(()=>{ audio.currentTime=st||0; setUI(true); fadeVol(0,0.45,900); }).catch(()=>{}); },320); }
+  toggleBtn.addEventListener('click',()=>{
+    if(!userStarted){ userStarted=true; userPaused=false; audio.play().then(()=>{ setUI(true); fadeVol(0,0.45,800); }).catch(()=>{}); }
+    else if(isPlaying){ fadeVol(audio.volume,0,400); setTimeout(()=>{ audio.pause(); setUI(false); },420); userPaused=true; }
+    else { userPaused=false; audio.play().then(()=>{ setUI(true); fadeVol(0,0.45,600); }).catch(()=>{}); }
+  });
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting)return;
+      e.target.classList.add('visible');
+      const url=e.target.dataset.songUrl, name=e.target.dataset.songName, st=parseFloat(e.target.dataset.startTime)||0;
+      if(userStarted&&!userPaused){
+        if(currentUrl===url){ if(!isPlaying){ audio.currentTime=st; audio.play().then(()=>{ audio.currentTime=st; setUI(true); fadeVol(0,0.45,900); }).catch(()=>{}); } }
+        else swapSong(url,name,st);
+      } else if(!userStarted){ if(currentUrl!==url){ currentUrl=url; audio.src=url; audio.volume=0; titleEl.textContent=name; } }
+    });
+  },{threshold:0.35});
+  moments.forEach(m=>obs.observe(m));
+
+  // Hero sections → play Coldplay (Moment.mp3)
+  const heroSections = ['hero','celebrate','moments-intro'].map(id=>document.getElementById(id)).filter(Boolean);
+  const heroObs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting||!userStarted||userPaused) return;
+      if(currentUrl!=='Moment.mp3'){ currentUrl='Moment.mp3'; titleEl.textContent='Magic'; fadeVol(audio.volume,0,300); setTimeout(()=>{ audio.src='Moment.mp3'; audio.volume=0; audio.currentTime=18; if(!userPaused) audio.play().then(()=>{ audio.currentTime=18; setUI(true); fadeVol(0,0.45,900); }).catch(()=>{}); },320); }
+    });
+  },{threshold:0.3});
+  heroSections.forEach(s=>heroObs.observe(s));
+</script>
+</body>
+</html>
